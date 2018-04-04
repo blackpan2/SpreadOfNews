@@ -1,0 +1,49 @@
+html {
+    font-family: sans-serif;
+}
+
+#content {
+    width: 1000px;
+    margin: 0 auto;
+}
+
+#cy {
+    width: 1000px;
+    height: 847px;
+    position: relative;
+    top: 0;
+    left: 0;
+    background: url('http://tile.loc.gov/image-services/iiif/service:gmd:gmd370:g3700:g3700:rr000020/full/pct:25/0/default.jpg') no-repeat;
+    background-size: 1000px auto;
+}
+
+#error-div {
+    border: 1px solid;
+    margin: 10px 0px;
+    padding: 15px 10px 15px 50px;
+    color: #D8000C;
+    background-color: #FFBABA;
+    display: none;
+}
+
+table.dataTable {
+    border: 2px solid #000000;
+    background-color: #EEEEEE;
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+}
+
+table.dataTable td, table.dataTable th {
+    border: 1px solid #000000;
+    padding: 5px 4px;
+}
+
+table.dataTable tbody td {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+table.dataTable tfoot td {
+    font-size: 14px;
+}

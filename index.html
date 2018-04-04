@@ -1,0 +1,49 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Spread of News</title>
+
+    <link href="css/style.css" rel="stylesheet"/>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.9/js/all.js"
+            integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl"
+            crossorigin="anonymous"></script>
+</head>
+
+<body>
+<div id="content">
+    <h1>Spreading the News</h1>
+    <p>All distances are approximate.
+        <button id="reset-button">Reset</button>
+    </p>
+    <div id="error-div">
+        <span id="error-message"></span>
+        <button id="close-error-button"><i class="fas fa-times-circle"></i></button>
+    </div>
+    <table class="dataTable">
+        <tbody>
+        <tr>
+            <td>Origin: <span id="origin-city-name"></span></td>
+            <td>Destination: <span id="destination-city-name"></span></td>
+            <td>
+                <label>Travel Method:
+                    <select id="travel_method" name="travel_method">
+                        <option value="">Select One …</option>
+                        <option value="road">Road</option>
+                        <option value="railroad">Railroad</option>
+                    </select>
+                </label>
+            </td>
+            <td>Distance: <span id="distance-report"></span>mi</td>
+            <td>Time: <span id="time-report"></span></td>
+        </tr>
+        </tbody>
+    </table>
+    <div id="cy"></div>
+</div>
+<script src="js/cytoscape.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="js/index.js"></script>
+</body>
