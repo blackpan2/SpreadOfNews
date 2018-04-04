@@ -2,14 +2,14 @@ var cy = cytoscape({
     container: document.getElementById('cy'),
     elements: [
         /* Menu */
-        /* Railroad Menu */ {
-            data: {
-                id: 'rail',
-                name: 'Railroad'
-            },
-            grabbable: false,
-            classes: 'menu'
-        },
+        /* Railroad Menu */ //{
+        //     data: {
+        //         id: 'rail',
+        //         name: 'Railroad'
+        //     },
+        //     grabbable: false,
+        //     classes: 'menu'
+        // },
 
         /* Cities */
         /* New York, NY */ {
@@ -115,7 +115,6 @@ cy.$('#Richmond').position({x: 655.7937420584498, y: 463.065232456496});
 cy.$('#Baltimore').position({x: 673.7803660097145, y: 407.7123397045969});
 cy.autolock(true);
 
-
 var originNode = null;
 var destinationNode = null;
 
@@ -164,7 +163,6 @@ highlightNextEle = function (i, nodePath) {
         i++;
         setTimeout(highlightNextEle(i, nodePath), 500);
     }
-
 };
 
 calculateDistance = function (nodePath) {
@@ -220,7 +218,6 @@ changeEventHandler = function () {
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("reset-button").onclick = reset;
     document.getElementById("close-error-button").onclick = closeError;
-
     document.querySelector('select[name="travel_method"]').onchange = changeEventHandler;
 }, false);
 
