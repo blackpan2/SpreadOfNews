@@ -7,14 +7,29 @@ html {
     margin: 0 auto;
 }
 
+#cy-map-wrapper {
+    width: 1000px;
+    height: 1260px;
+    top: 0;
+    left: 0;
+    position: relative;
+}
+
 #cy {
     width: 1000px;
-    height: 847px;
+    height: 1260px;
     position: relative;
     top: 0;
     left: 0;
-    background: url('http://tile.loc.gov/image-services/iiif/service:gmd:gmd370:g3700:g3700:rr000020/full/pct:25/0/default.jpg') no-repeat;
-    background-size: 1000px auto;
+}
+
+#map {
+    z-index: -1;
+    width: 1000px;
+    height: 1260px;
+    top: 0;
+    left: 0;
+    position: absolute;
 }
 
 #error-div {

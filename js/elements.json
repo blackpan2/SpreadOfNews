@@ -1,0 +1,398 @@
+{
+  "nodes": [
+    {
+      "data": {
+        "id": "MA_B",
+        "name": "Boston"
+      },
+      "classes": "city",
+      "position": {
+        "x": 857,
+        "y": 391
+      }
+    },
+    {
+      "data": {
+        "id": "MA_W",
+        "name": "Worcester"
+      },
+      "classes": "city",
+      "position": {
+        "x": 832,
+        "y": 397
+      }
+    },
+    {
+      "data": {
+        "id": "NY_NY",
+        "name": "New York"
+      },
+      "classes": "city",
+      "position": {
+        "x": 763,
+        "y": 467
+      }
+    },
+    {
+      "data": {
+        "id": "NY_N",
+        "name": "Newburg"
+      },
+      "classes": "city",
+      "position": {
+        "x": 760,
+        "y": 433
+      }
+    },
+    {
+      "data": {
+        "id": "VA_R",
+        "name": "Richmond"
+      },
+      "classes": "city",
+      "position": {
+        "x": 661,
+        "y": 609
+      }
+    },
+    {
+      "data": {
+        "id": "CT_H",
+        "name": "Hartford"
+      },
+      "classes": "city",
+      "position": {
+        "x": 803,
+        "y": 417
+      }
+    },
+    {
+      "data": {
+        "id": "RI_P",
+        "name": "Providence"
+      },
+      "classes": "city",
+      "position": {
+        "x": 844,
+        "y": 416
+      }
+    },
+    {
+      "data": {
+        "id": "CT_L",
+        "name": "London"
+      },
+      "classes": "city",
+      "position": {
+        "x": 824,
+        "y": 437
+      }
+    },
+    {
+      "data": {
+        "id": "CT_N",
+        "name": "New Haven"
+      },
+      "classes": "city",
+      "position": {
+        "x": 808,
+        "y": 440
+      }
+    },
+    {
+      "data": {
+        "id": "MD_B",
+        "name": "Baltimore"
+      },
+      "classes": "city",
+      "position": {
+        "x": 685,
+        "y": 536
+      }
+    },
+    {
+      "data": {
+        "id": "NY_MPt",
+        "name": "Montauk Pt."
+      },
+      "classes": "city",
+      "position": {
+        "x": 830,
+        "y": 451
+      }
+    },
+    {
+      "data": {
+        "id": "NJ_T",
+        "name": "Trenton"
+      },
+      "classes": "city",
+      "position": {
+        "x": 741,
+        "y": 490
+      }
+    },
+    {
+      "data": {
+        "id": "NJ_Tu",
+        "name": "Tuckertown"
+      },
+      "classes": "city",
+      "position": {
+        "x": 753,
+        "y": 516
+      }
+    },
+    {
+      "data": {
+        "id": "PA_P",
+        "name": "Philidelphia"
+      },
+      "classes": "city",
+      "position": {
+        "x": 727,
+        "y": 504
+      }
+    },
+    {
+      "data": {
+        "id": "PA_W",
+        "name": "Wilmington"
+      },
+      "classes": "city",
+      "position": {
+        "x": 718,
+        "y": 515
+      }
+    },
+    {
+      "data": {
+        "id": "MD_SH",
+        "name": "Snow Hill"
+      },
+      "classes": "city",
+      "position": {
+        "x": 729,
+        "y": 578
+      }
+    },
+    {
+      "data": {
+        "id": "PA_G",
+        "name": "Gettysburg"
+      },
+      "classes": "city",
+      "position": {
+        "x": 659,
+        "y": 514
+      }
+    },
+    {
+      "data": {
+        "id": "PA_L",
+        "name": "Lancaster"
+      },
+      "classes": "city",
+      "position": {
+        "x": 693,
+        "y": 502
+      }
+    },
+    {
+      "data": {
+        "id": "PA_E",
+        "name": "Easton"
+      },
+      "classes": "city",
+      "position": {
+        "x": 724,
+        "y": 474
+      }
+    },
+    {
+      "data": {
+        "id": "PA_R",
+        "name": "Reading"
+      },
+      "classes": "city",
+      "position": {
+        "x": 704,
+        "y": 486
+      }
+    },
+    {
+      "data": {
+        "id": "PA_Y",
+        "name": "York"
+      },
+      "classes": "city",
+      "position": {
+        "x": 677,
+        "y": 509
+      }
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "source": "MA_B",
+        "target": "RI_P",
+        "length": "1",
+        "type": "railroad"
+      },
+      "classes": "railroad"
+    },
+    {
+      "data": {
+        "source": "RI_P",
+        "target": "CT_L",
+        "length": "1",
+        "type": "railroad"
+      },
+      "classes": "railroad"
+    },
+    {
+      "data": {
+        "source": "RI_P",
+        "target": "CT_H",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "CT_H",
+        "target": "CT_N",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "CT_L",
+        "target": "CT_N",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "CT_N",
+        "target": "NY_NY",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "CT_H",
+        "target": "NY_N",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "NY_N",
+        "target": "NY_NY",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "MA_B",
+        "target": "MA_W",
+        "length": "5",
+        "type": "railroad"
+      },
+      "classes": "railroad"
+    },
+    {
+      "data": {
+        "source": "MA_W",
+        "target": "CT_H",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "NY_NY",
+        "target": "PA_E",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "PA_E",
+        "target": "PA_R",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "PA_E",
+        "target": "NJ_T",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "NY_NY",
+        "target": "NJ_T",
+        "length": "1",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "source": "NY_NY",
+        "target": "NJ_T",
+        "length": "1",
+        "type": "railroad"
+      },
+      "classes": "railroad"
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

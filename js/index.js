@@ -1,139 +1,121 @@
-var cy = cytoscape({
-    container: document.getElementById('cy'),
-    elements: [
-        /* Menu */
-        /* Railroad Menu */ //{
-        //     data: {
-        //         id: 'rail',
-        //         name: 'Railroad'
-        //     },
-        //     grabbable: false,
-        //     classes: 'menu'
-        // },
+var elementData = {};
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function () {
+    if (this.readyState === 4 && this.status === 200) {
+        elementData = JSON.parse(this.responseText);
+        initCytoscape();
+    }
+};
+xhttp.open("GET", "./js/elements.json", true);
+xhttp.send();
 
-        /* Cities */
-        /* New York, NY */ {
-            data: {
-                id: 'NewYork',
-                name: 'New York'
-            },
-            grabbable: false,
-            classes: 'city'
-        },
-        /* Boston, MA */ {
-            data: {
-                id: 'Boston',
-                name: 'Boston'
-            },
-            grabbable: false,
-            classes: 'city'
-        },
-        /* Washington DC */ {
-            data: {
-                id: "DC",
-                name: 'DC'
-            },
-            grabbable: false,
-            classes: 'city'
-        },
-        /* Richmond, VA */ {
-            data: {
-                id: "Richmond",
-                name: 'Richmond'
-            },
-            grabbable: false,
-            classes: 'city'
-        },
-        /* Baltimore, MA */ {
-            data: {
-                id: "Baltimore",
-                name: 'Baltimore'
-            },
-            grabbable: false,
-            classes: 'city'
-        },
+var cy;
 
-        /* Routes */
-        /* Baltimore to DC RR */ {
-            data: {
-                id: 'Baltimore-DC-RR',
-                source: 'DC',
-                target: 'Baltimore',
-                length: '17.32'
+function initCytoscape() {
+    cy = cytoscape({
+        container: document.getElementById('cy'),
+        elements: elementData,
+        style: [
+            {
+                selector: '.city',
+                style: {
+                    'background-color': 'green',
+                    width: '10px',
+                    height: '10px',
+                    shape: 'circle'
+                }
             },
-            classes: 'railroad'
-        },
-        /* DC to Richmond R */ {
-            data: {
-                id: 'DC-Richmond-R',
-                source: 'DC',
-                target: 'Richmond',
-                length: '52.44',
-                'type': 'road'
+            {
+                selector: '.road',
+                style: {
+                    'line-color': 'red',
+                    'line-style': 'dotted',
+                    'curve-style': 'haystack',
+                    'haystack-radius': 0
+                }
             },
-            classes: 'road'
-        },
-    ],
-    style: [
-        {
-            selector: '.city',
-            style: {
-                label: 'data(name)',
-                width: '5px',
-                height: '5px',
-                shape: 'star'
+            {
+                selector: '.railroad',
+                style: {
+                    'line-color': 'blue',
+                    'line-style': 'dotted',
+                    'curve-style': 'haystack',
+                    'haystack-radius': 0
+                }
+            },
+            {
+                selector: '.highlighted',
+                style: {
+                    'line-color': 'yellow',
+                    'background-color': 'yellow',
+                    'transition-property': 'background-color, line-color line-style',
+                    'transition-duration': '1s'
+                }
             }
-        },
-        {
-            selector: '.road',
-            style: {
-                'line-color': 'red'
-            }
-        },
-        {
-            selector: '.railroad',
-            style: {
-                'line-color': 'blue'
-            }
-        },
-        {
-            selector: '.highlighted',
-            style: {
-                'line-color': 'yellow',
-                'background-color': 'yellow'
-            }
+        ],
+        layout: {name: "preset", fit: false}
+    });
+    cy.userZoomingEnabled(false);
+    cy.panningEnabled(false);
+    cy.boxSelectionEnabled(false);
+    cy.autolock(true);
+
+    cy.on('tap', 'node', function (evt) {
+        switch ($("select#usage_method option:checked").val()) {
+            case 'distance':
+                var eventNode = cy.$('#' + evt.cyTarget._private.data.id);
+                if (originNode === null) {
+                    $('#origin-city-name').text(eventNode.data('name'));
+                    originNode = eventNode;
+                } else {
+                    if (originNode.data('id') !== eventNode.data('id')) {
+                        if (destinationNode === null || destinationNode.data('id') !== eventNode.data('id')) {
+                            clearHighlighted();
+                            destinationNode = eventNode;
+                            $('#destination-city-name').text(eventNode.data('name'));
+                            getDistance();
+                        }
+                    }
+                }
+                break;
+            case 'spread':
+                var search = findPath(evt.cyTarget._private.data.id);
+                var i = 0;
+                var highlightSpread = function () {
+                    if (i < search.length) {
+                        var delay = 1000 * fw.distance('#' + evt.cyTarget._private.data.id, search[i]);
+                        if (delay !== Infinity) {
+                            setTimeout(function () {
+                                this.addClass('highlighted')
+                            }.bind(search[i]), delay);
+                        }
+                        i++;
+                        highlightSpread()
+                    }
+                };
+                highlightSpread();
+                break;
         }
-    ]
-});
-cy.userZoomingEnabled(false);
-cy.panningEnabled(false);
-cy.boxSelectionEnabled(false);
-cy.$('#NewYork').position({x: 731.6192144962017, y: 354.86552984220555});
-cy.$('#Boston').position({x: 792.6015696107851, y: 303.39249506610065});
-cy.$('#DC').position({x: 665.0176484900919, y: 421.6544006326204});
-cy.$('#Richmond').position({x: 655.7937420584498, y: 463.065232456496});
-cy.$('#Baltimore').position({x: 673.7803660097145, y: 407.7123397045969});
-cy.autolock(true);
+    });
+
+}
+var fw;
+spreadToAllNodes = function (originId) {
+    fw = cy.elements().floydWarshall(function (edge) {
+        return edge.data('length');
+    });
+    return cy.collection('.city').sort(function (a, b) {
+        return fw.distance('#' + originId, '#' + a.data('id')) - fw.distance('#' + originId, '#' + b.data('id'));
+    }).toArray();
+};
+
+findPath = function (originId) {
+    return spreadToAllNodes(originId, []);
+    // return cy.elements().bfs(originId, function () {}, false);
+};
 
 var originNode = null;
 var destinationNode = null;
-
-cy.on('tap', 'node', function (evt) {
-    var eventNode = cy.$('#' + evt.cyTarget._private.data.id);
-    if (originNode === null) {
-        $('#origin-city-name').text(eventNode.data('name'));
-        originNode = eventNode;
-    } else {
-        if (originNode.data('id') !== eventNode.data('id')) {
-            if (destinationNode === null || destinationNode.data('id') !== eventNode.data('id')) {
-                clearHighlighted();
-                destinationNode = eventNode;
-                $('#destination-city-name').text(eventNode.data('name'));
-                getDistance();
-            }
-        }
-    }
-});
 
 getDistance = function () {
     var travel_method = $("select#travel_method option:checked").val();
@@ -161,7 +143,7 @@ highlightNextEle = function (i, nodePath) {
     el.addClass('highlighted');
     if (i < nodePath.length - 1) {
         i++;
-        setTimeout(highlightNextEle(i, nodePath), 500);
+        setTimeout(highlightNextEle(i, nodePath), 1000);
     }
 };
 
@@ -176,7 +158,6 @@ calculateDistance = function (nodePath) {
     });
     $('#distance-report').text(totalDistance);
 };
-
 
 showError = function (msg) {
     $('#error-message').text(msg);
@@ -198,6 +179,8 @@ reset = function () {
     $('#distance-report').text("");
 
     clearHighlighted();
+
+    closeError();
 };
 
 clearHighlighted = function () {
@@ -211,6 +194,7 @@ clearHighlighted = function () {
 changeEventHandler = function () {
     if (originNode !== null && destinationNode !== null) {
         clearHighlighted();
+        closeError();
         getDistance();
     }
 };
