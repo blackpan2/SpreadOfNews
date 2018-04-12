@@ -237,7 +237,7 @@
       "data": {
         "source": "MA_B",
         "target": "RI_P",
-        "length": "1",
+        "length": "46.17",
         "type": "railroad"
       },
       "classes": "railroad"
@@ -246,7 +246,7 @@
       "data": {
         "source": "RI_P",
         "target": "CT_L",
-        "length": "1",
+        "length": "45.79",
         "type": "railroad"
       },
       "classes": "railroad"
@@ -255,7 +255,7 @@
       "data": {
         "source": "RI_P",
         "target": "CT_H",
-        "length": "1",
+        "length": "65",
         "type": "road"
       },
       "classes": "road"
@@ -264,7 +264,7 @@
       "data": {
         "source": "CT_H",
         "target": "CT_N",
-        "length": "1",
+        "length": "34.07",
         "type": "road"
       },
       "classes": "road"
@@ -273,7 +273,7 @@
       "data": {
         "source": "CT_L",
         "target": "CT_N",
-        "length": "1",
+        "length": "28.21",
         "type": "road"
       },
       "classes": "road"
@@ -282,7 +282,7 @@
       "data": {
         "source": "CT_N",
         "target": "NY_NY",
-        "length": "1",
+        "length": "87.04",
         "type": "road"
       },
       "classes": "road"
@@ -291,7 +291,7 @@
       "data": {
         "source": "CT_H",
         "target": "NY_N",
-        "length": "1",
+        "length": "71.62",
         "type": "road"
       },
       "classes": "road"
@@ -300,7 +300,7 @@
       "data": {
         "source": "NY_N",
         "target": "NY_NY",
-        "length": "1",
+        "length": "61.27",
         "type": "road"
       },
       "classes": "road"
@@ -309,7 +309,7 @@
       "data": {
         "source": "MA_B",
         "target": "MA_W",
-        "length": "5",
+        "length": "43.7",
         "type": "railroad"
       },
       "classes": "railroad"
@@ -318,7 +318,7 @@
       "data": {
         "source": "MA_W",
         "target": "CT_H",
-        "length": "1",
+        "length": "50.05",
         "type": "road"
       },
       "classes": "road"
@@ -327,7 +327,7 @@
       "data": {
         "source": "NY_NY",
         "target": "PA_E",
-        "length": "1",
+        "length": "64.48",
         "type": "road"
       },
       "classes": "road"
@@ -336,7 +336,7 @@
       "data": {
         "source": "PA_E",
         "target": "PA_R",
-        "length": "1",
+        "length": "35.6",
         "type": "road"
       },
       "classes": "road"
@@ -345,7 +345,16 @@
       "data": {
         "source": "PA_E",
         "target": "NJ_T",
-        "length": "1",
+        "length": "39.83",
+        "type": "canal"
+      },
+      "classes": "canal"
+    },
+    {
+      "data": {
+        "source": "NY_NY",
+        "target": "NJ_T",
+        "length": "51.85",
         "type": "road"
       },
       "classes": "road"
@@ -353,20 +362,83 @@
     {
       "data": {
         "source": "NY_NY",
-        "target": "NJ_T",
-        "length": "1",
-        "type": "road"
-      },
-      "classes": "road"
-    },
-    {
-      "data": {
-        "source": "NY_NY",
-        "target": "NJ_T",
-        "length": "1",
+        "target": "PA_P",
+        "length": "79.89",
         "type": "railroad"
       },
       "classes": "railroad"
+    },
+    {
+      "data": {
+        "target": "NY_NY",
+        "source": "NY_MPt",
+        "length": "106.36",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "target": "PA_P",
+        "source": "NJ_Tu",
+        "length": "43.12",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "target": "PA_P",
+        "source": "NJ_T",
+        "length": "33.05",
+        "type": "railroad"
+      },
+      "classes": "railroad"
+    },
+    {
+      "data": {
+        "target": "NY_NY",
+        "source": "NJ_Tu",
+        "length": "80.5",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "target": "PA_R",
+        "source": "PA_L",
+        "length": "33.45",
+        "type": "road"
+      },
+      "classes": "road"
+    },
+    {
+      "data": {
+        "target": "PA_L",
+        "source": "PA_P",
+        "length": "54.85",
+        "type": "railroad"
+      },
+      "classes": "railroad"
+    },
+    {
+      "data": {
+        "target": "PA_R",
+        "source": "PA_P",
+        "length": "50.79",
+        "type": "canal"
+      },
+      "classes": "canal"
+    },
+    {
+      "data": {
+        "target": "PA_R",
+        "source": "PA_P",
+        "length": "48.16",
+        "type": "road"
+      },
+      "classes": "road"
     }
   ]
 }

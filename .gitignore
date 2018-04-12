@@ -61,3 +61,4 @@ typings/
 .next
 .idea/
 /maps/usMap1835.ortl/
+.DS_Store

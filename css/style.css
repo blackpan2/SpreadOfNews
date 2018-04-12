@@ -9,7 +9,7 @@ html {
 
 #cy-map-wrapper {
     width: 1000px;
-    height: 1260px;
+    height: 600px;
     top: 0;
     left: 0;
     position: relative;
@@ -17,7 +17,7 @@ html {
 
 #cy {
     width: 1000px;
-    height: 1260px;
+    height: 600px;
     position: relative;
     top: 0;
     left: 0;
