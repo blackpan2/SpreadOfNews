@@ -86,27 +86,14 @@ function initCytoscape() {
                             clearHighlighted();
                             destinationNode = eventNode;
                             $('#destination-city-name').text(eventNode.data('name'));
-                            getDistance();
+                            travelTime();
                         }
                     }
                 }
                 break;
             case 'spread':
-                let search = findPath(eventId);
-                let i = 0;
-                let highlightSpread = function () {
-                    if (i < search.length) {
-                        const delay = 1000 * fw.distance('#' + eventId, search[i]);
-                        if (delay !== Infinity) {
-                            setTimeout(function () {
-                                this.addClass('highlighted')
-                            }.bind(search[i]), delay);
-                        }
-                        i++;
-                        highlightSpread()
-                    }
-                };
-                highlightSpread();
+                let spread = spreadToAllNodes(eventId, []);
+                highlightSpread(eventId, spread.pathData, spread.array);
                 break;
         }
     });
@@ -116,7 +103,7 @@ function initCytoscape() {
     });
     canvas = layer.getCanvas();
     ctx = canvas.getContext('2d');
-    cy.on("render cyCanvas.resize", function (evt) {
+    function draw() {
         layer.resetTransform(ctx);
         layer.clear(ctx);
         layer.setTransform(ctx);
@@ -125,107 +112,34 @@ function initCytoscape() {
         // Draw a background
         ctx.drawImage(background, 0, 0, 1000, 1260);
 
-        // // Draw text that follows the model
-        // ctx.font = "24px Helvetica";
-        // ctx.fillStyle = "black";
-        // ctx.fillText("This text follows the model", 200, 300);
-
-        // Draw text that is fixed in the canvas
         layer.resetTransform(ctx);
         ctx.save();
         ctx.restore();
+    }
+
+    cy.on("render cyCanvas.resize", function () {
+        draw();
     });
-    layer.resetTransform(ctx);
-    layer.clear(ctx);
-    layer.setTransform(ctx);
-    ctx.save();
-    ctx.drawImage(background, 0, 0, 1000, 1260);
-    layer.resetTransform(ctx);
-    ctx.save();
-    ctx.restore();
+    draw();
 }
 
-let fw;
-spreadToAllNodes = function (originId) {
-    fw = cy.elements().floydWarshall(function (edge) {
-        return edge.data('length');
-    });
-    return cy.collection('.city').sort(function (a, b) {
-        return fw.distance('#' + originId, '#' + a.data('id')) - fw.distance('#' + originId, '#' + b.data('id'));
-    }).toArray();
-};
-
-findPath = function (originId) {
-    return spreadToAllNodes(originId, []);
-};
-
-let originNode = null;
-let destinationNode = null;
-
-getDistance = function () {
-    let travel_method = $("select#travel_method option:checked").val();
-    if (travel_method === "") {
-        showError("Please select a travel method");
-    } else {
-        let coll = cy.collection()
-            .add(cy.nodes('.city'))
-            .add(cy.edges('.' + travel_method));
-        let dijkstra = coll.dijkstra(originNode, function (edge) {
-            return parseInt(edge._private.data.length);
-        }, false);
-        let nodePath = dijkstra.pathTo(destinationNode);
-        if (nodePath.length === 1) {
-            showError("No connection");
-        } else {
-            highlightNextEle(0, nodePath);
-            calculateDistance(nodePath);
-        }
-    }
-};
-
-highlightNextEle = function (i, nodePath) {
-    let el = nodePath[i];
-    el.addClass('highlighted');
-    if (i < nodePath.length - 1) {
-        i++;
-        setTimeout(highlightNextEle(i, nodePath), 1000);
-    }
-};
-
+/* Common */
 calculateDistance = function (nodePath) {
     nodePath = nodePath.filter(function (ele, i) {
         return ele.isEdge();
     });
     let totalDistance = 0;
-    nodePath.forEach(function (ele, i, eles) {
+    nodePath.forEach(function (ele) {
         totalDistance = totalDistance + parseFloat(ele.data('length'));
 
     });
-    $('#distance-report').text(totalDistance);
+    return totalDistance.toFixed(2);
 };
 
-showError = function (msg) {
-    $('#error-message').text(msg);
-    $('#error-div').css("display", "inherit");
-};
-
-closeError = function () {
-    $('#error-message').text("");
-    $('#error-div').css("display", "");
-};
-
-reset = function () {
-    originNode = null;
-    $('#origin-city-name').text("");
-
-    destinationNode = null;
-    $('#destination-city-name').text("");
-
-    $('#distance-report').text("");
-
-    clearHighlighted();
-
-    closeError();
+highlightEle = function (cyElement, delay) {
+    setTimeout(function () {
+        this.addClass('highlighted')
+    }.bind(cyElement), delay);
 };
 
 clearHighlighted = function () {
@@ -236,17 +150,107 @@ clearHighlighted = function () {
     });
 };
 
-changeEventHandler = function () {
-    if (originNode !== null && destinationNode !== null) {
-        clearHighlighted();
-        closeError();
-        getDistance();
+/* Spread to all node functionality */
+spreadToAllNodes = function (originId) {
+    let fw = cy.elements().floydWarshall(function (edge) {
+        return edge.data('length');
+    });
+    let fwArray = cy.collection('.city').sort(function (a, b) {
+        return fw.distance('#' + originId, '#' + a.data('id')) - fw.distance('#' + originId, '#' + b.data('id'));
+    }).toArray();
+    return {
+        pathData: fw,
+        array: fwArray
+    };
+};
+
+highlightSpread = function (originId, pathData, orderedCities) {
+    let i = 0;
+    while (i < orderedCities.length) {
+        const edgeCount = pathData.distance('#' + originId, orderedCities[i]);
+        if (edgeCount !== Infinity) {
+            let individualPath = pathData.path('#' + originId, orderedCities[i]);
+            highlightEle(orderedCities[i], calculateDistance(individualPath) * 50);
+        }
+        i++;
     }
 };
 
+/* Travel time between cities functionality */
+let originNode = null;
+let destinationNode = null;
+
+travelTime = function () {
+    let travel_method = $("select#travel_method option:checked").val();
+    if (travel_method === "") {
+        showError("Please select a travel method");
+    }
+    else if (originNode !== null && destinationNode !== null) {
+        let coll = cy.collection()
+            .add(cy.nodes('.city'))
+            .add(cy.edges('.' + travel_method));
+        let dijkstra = coll.dijkstra(originNode, function (edge) {
+            return parseInt(edge._private.data.length);
+        }, false);
+        let nodePath = dijkstra.pathTo(destinationNode);
+        if (nodePath.length === 1) {
+            showError("No connection");
+        } else {
+            highlightTravelTime(nodePath);
+            reportDistance(calculateDistance(nodePath));
+        }
+    }
+};
+
+highlightTravelTime = function (collection) {
+    let i = 0;
+    while (i < collection.length) {
+        let el = collection[i];
+        highlightEle(el, i * 1000);
+        i++;
+    }
+};
+
+reportDistance = function (totalDistance) {
+    $('#distance-report').text(totalDistance);
+};
+
+/* Event Handlers */
+changeEventHandler = function () {
+    if (originNode !== null && destinationNode !== null || originNode === null && destinationNode === null) {
+        clearHighlighted();
+        onCloseError();
+        travelTime();
+    }
+};
+
+onReset = function () {
+    originNode = null;
+    $('#origin-city-name').text("");
+
+    destinationNode = null;
+    $('#destination-city-name').text("");
+
+    $('#distance-report').text("");
+
+    clearHighlighted();
+
+    onCloseError();
+};
+
+showError = function (msg) {
+    $('#error-message').text(msg);
+    $('#error-div').css("display", "inherit");
+};
+
+onCloseError = function () {
+    $('#error-message').text("");
+    $('#error-div').css("display", "");
+};
+
+/* Attach button interactions */
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById("reset-button").onclick = reset;
-    document.getElementById("close-error-button").onclick = closeError;
+    document.getElementById("reset-button").onclick = onReset;
+    document.getElementById("close-error-button").onclick = onCloseError;
     document.querySelector('select[name="travel_method"]').onchange = changeEventHandler;
 }, false);
-
