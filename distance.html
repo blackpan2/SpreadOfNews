@@ -17,25 +17,23 @@
 </head>
 <body>
 <div id="content">
-    <h1>Spreading the News</h1>
-    <p>All distances are approximate.
-        <!--Todo add more explanation-->
-        <!--Todo add information about the different traversal options-->
-        For the full screen experiences <a href="spread.html">Spreading news across all pathways</a> & <a href="distance.html">Travel time between 2 cities</a>
-    </p>
     <div id="error-div">
         <span id="error-message"></span>
         <button id="close-error-button"><i class="fas fa-times-circle"></i></button>
     </div>
     <div id="menu">
-        <label>App Usage:
+        <label class="hidden">App Usage:
             <select id="usage_method" name="usage_method">
-                <option value="spread">Spreading news across all pathways</option>
                 <option value="distance">Travel Time between 2 cities</option>
             </select>
         </label>
-        <button id="reset-button">Reset</button>
-        <label class="travel_method_wrapper hidden">Travel Method:
+
+    </div>
+    <div id="cy-map-wrapper-full">
+        <div id="cy"></div>
+    </div>
+    <div class="bottomLeftMenu">
+        <label class="travel_method_wrapper">Travel Method:
             <select id="travel_method" name="travel_method">
                 <option value="">Select One …</option>
                 <option value="road">Roads</option>
@@ -43,9 +41,7 @@
                 <option value="railroad">Roads, Canal, & Railroads</option>
             </select>
         </label>
-    </div>
-    <div id="cy-map-wrapper">
-        <div id="cy"></div>
+        <button id="reset-button">Reset</button>
     </div>
 </div>
 <script src="js/cytoscape.js"></script>

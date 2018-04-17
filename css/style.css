@@ -15,9 +15,18 @@ html {
     position: relative;
 }
 
+#cy-map-wrapper-full {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: absolute;
+    z-index: -1;
+}
+
 #cy {
-    width: 1000px;
-    height: 615px;
+    width: 100%;
+    height: 100%;
     position: relative;
     top: 0;
     left: 0;
@@ -47,4 +56,25 @@ html {
 
 .hidden {
     visibility: hidden;
+}
+
+.bottomLeftReset {
+    height: 50px;
+    width: 50px;
+    border: 1px solid Black;
+    text-align: center;
+    position: absolute;
+    top: calc(90vh - (/* height */50px / 2));
+    left: calc(50vw - (/* width */50px / 2));
+}
+
+.bottomLeftMenu {
+    height: 60px;
+    width: 200px;
+    border: 1px solid Black;
+    background-color: White;
+    text-align: center;
+    position: absolute;
+    top: calc(90vh - (/* height */60px / 2));
+    left: calc(50vw - (/* width */200px / 2));
 }
