@@ -41,24 +41,10 @@ html {
     display: none;
 }
 
-table.dataTable {
-    border: 2px solid #000000;
-    background-color: #EEEEEE;
-    width: 100%;
-    text-align: center;
-    border-collapse: collapse;
+#menu {
+    padding-bottom: 1em;
 }
 
-table.dataTable td, table.dataTable th {
-    border: 1px solid #000000;
-    padding: 5px 4px;
-}
-
-table.dataTable tbody td {
-    font-size: 13px;
-    font-weight: bold;
-}
-
-table.dataTable tfoot td {
-    font-size: 14px;
+.hidden {
+    visibility: hidden;
 }

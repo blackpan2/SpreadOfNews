@@ -77,41 +77,6 @@ function initCytoscape() {
     });
     canvas = layer.getCanvas();
     ctx = canvas.getContext('2d');
-    function drawStationary() {
-        ctx.fillStyle = 'black';
-        ctx.fillRect(10, 10, 400, 250);
-        ctx.fillStyle = 'white';
-        ctx.fillRect(15, 15, 390, 240);
-
-        ctx.font = "small-caps 700 30px system-ui";
-        ctx.fillStyle = "black";
-        if (travelTime.originNode) {
-            ctx.fillText("Origin: " + travelTime.originNode.data('name') + ", " + travelTime.originNode.data('state'), 20, 65, 380);
-        }
-        if (travelTime.destinationNode) {
-            // if (true) {
-            ctx.fillText("Destination: " + travelTime.destinationNode.data('name') + ", " + travelTime.destinationNode.data('state'), 20, 115, 380);
-            ctx.fillText("Distance: " + travelTime.distance + "mi.", 20, 165, 380);
-            ctx.fillText("Travel Time: " + travelTime.time + "hr.", 20, 215, 380);
-        }
-    }
-
-    function drawBackground() {
-        layer.resetTransform(ctx);
-        layer.clear(ctx);
-        layer.setTransform(ctx);
-        ctx.save();
-        ctx.drawImage(background, 0, 0, 1000, 1260);
-    }
-
-    function draw() {
-        drawBackground();
-        layer.resetTransform(ctx);
-        ctx.save();
-
-        drawStationary();
-        ctx.restore();
-    }
 
     draw();
     cy.on("render cyCanvas.resize", function () {
@@ -142,6 +107,49 @@ function initCytoscape() {
         }
         draw();
     });
+}
+
+/* Canvas */
+function drawStationary() {
+    switch ($("select#usage_method option:checked").val()) {
+        case 'distance':
+            ctx.fillStyle = 'black';
+            ctx.fillRect(10, 10, 400, 250);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(15, 15, 390, 240);
+
+            ctx.font = "small-caps 700 30px system-ui";
+            ctx.fillStyle = "black";
+            if (travelTime.originNode) {
+                ctx.fillText("Origin: " + travelTime.originNode.data('name') + ", " + travelTime.originNode.data('state'), 20, 65, 380);
+            }
+            if (travelTime.destinationNode) {
+                // if (true) {
+                ctx.fillText("Destination: " + travelTime.destinationNode.data('name') + ", " + travelTime.destinationNode.data('state'), 20, 115, 380);
+                ctx.fillText("Distance: " + travelTime.distance + "mi.", 20, 165, 380);
+                ctx.fillText("Travel Time: " + travelTime.time + "hr.", 20, 215, 380);
+            }
+            break;
+        case 'spread':
+            break;
+    }
+}
+
+function drawBackground() {
+    layer.resetTransform(ctx);
+    layer.clear(ctx);
+    layer.setTransform(ctx);
+    ctx.save();
+    ctx.drawImage(background, 0, 0, 1000, 1260);
+}
+
+function draw() {
+    drawBackground();
+    layer.resetTransform(ctx);
+    ctx.save();
+
+    drawStationary();
+    ctx.restore();
 }
 
 /* Common */
@@ -238,7 +246,7 @@ highlightTravelTime = function (collection) {
 };
 
 /* Event Handlers */
-changeEventHandler = function () {
+changeTravelHandler = function () {
     if (travelTime.originNode !== null && travelTime.destinationNode !== null || travelTime.originNode === null && travelTime.destinationNode === null) {
         clearHighlighted();
         onCloseError();
@@ -246,17 +254,19 @@ changeEventHandler = function () {
     }
 };
 
+changeUsageHandler = function () {
+    onReset();
+    draw();
+    $(".travel_method_wrapper").toggleClass( "hidden", $("select#usage_method option:checked").val() !== "distance" );
+};
+
 onReset = function () {
     travelTime.originNode = null;
-    $('#origin-city-name').text("");
-
     travelTime.destinationNode = null;
-    $('#destination-city-name').text("");
-
-    $('#distance-report').text("");
+    travelTime.distance = 0;
+    travelTime.time = 0;
 
     clearHighlighted();
-
     onCloseError();
 };
 
@@ -274,5 +284,6 @@ onCloseError = function () {
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("reset-button").onclick = onReset;
     document.getElementById("close-error-button").onclick = onCloseError;
-    document.querySelector('select[name="travel_method"]').onchange = changeEventHandler;
+    document.querySelector('select[name="travel_method"]').onchange = changeTravelHandler;
+    document.querySelector('select[name="usage_method"]').onchange = changeUsageHandler;
 }, false);
