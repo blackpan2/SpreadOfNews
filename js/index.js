@@ -251,7 +251,6 @@ highlightSpread = function () {
         const edgeCount = spreadInfo.pathData.distance(spreadInfo.originNode, spreadInfo.cityArray[i]);
         if (edgeCount !== Infinity) {
             let individualPath = spreadInfo.pathData.path(spreadInfo.originNode, spreadInfo.cityArray[i]);
-            console.log(calculateTime(individualPath));
             highlightEle(spreadInfo.cityArray[i], calculateTime(individualPath) * 500);
         }
         i++;
