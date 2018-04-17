@@ -85,9 +85,9 @@ function initCytoscape() {
 
     cy.on('tap', 'node', function (evt) {
         let eventId = evt.target[0]._private.data.id;
+        let eventNode = cy.$('#' + eventId);
         switch ($("select#usage_method option:checked").val()) {
             case 'distance':
-                let eventNode = cy.$('#' + eventId);
                 if (travelTime.originNode === null) {
                     travelTime.originNode = eventNode;
                 } else {
@@ -101,8 +101,9 @@ function initCytoscape() {
                 }
                 break;
             case 'spread':
-                let spread = spreadToAllNodes(eventId, []);
-                highlightSpread(eventId, spread.pathData, spread.array);
+                spreadInfo.originNode = eventNode;
+                spreadToAllNodes();
+                highlightSpread();
                 break;
         }
         draw();
@@ -131,6 +132,16 @@ function drawStationary() {
             }
             break;
         case 'spread':
+            ctx.fillStyle = 'black';
+            ctx.fillRect(10, 10, 400, 250);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(15, 15, 390, 240);
+
+            ctx.font = "small-caps 700 30px system-ui";
+            ctx.fillStyle = "black";
+            if (spreadInfo.originNode) {
+                ctx.fillText("Origin: " + spreadInfo.originNode.data('name') + ", " + spreadInfo.originNode.data('state'), 20, 65, 380);
+            }
             break;
     }
 }
@@ -180,26 +191,29 @@ clearHighlighted = function () {
 };
 
 /* Spread to all node functionality */
-spreadToAllNodes = function (originId) {
-    let fw = cy.elements().floydWarshall(function (edge) {
-        return edge.data('length');
-    });
-    let fwArray = cy.collection('.city').sort(function (a, b) {
-        return fw.distance('#' + originId, '#' + a.data('id')) - fw.distance('#' + originId, '#' + b.data('id'));
-    }).toArray();
-    return {
-        pathData: fw,
-        array: fwArray
-    };
+let spreadInfo = {
+    originNode: null,
+    pathData: null,
+    cityArray: null
 };
 
-highlightSpread = function (originId, pathData, orderedCities) {
+spreadToAllNodes = function () {
+    spreadInfo.pathData = cy.elements().floydWarshall(function (edge) {
+        return edge.data('length');
+    });
+    spreadInfo.cityArray = cy.collection('.city').sort(function (nodeA, nodeB) {
+        return spreadInfo.pathData.distance(spreadInfo.originNode, nodeA)
+            - spreadInfo.pathData.distance(spreadInfo.originNode, nodeB);
+    }).toArray();
+};
+
+highlightSpread = function () {
     let i = 0;
-    while (i < orderedCities.length) {
-        const edgeCount = pathData.distance('#' + originId, orderedCities[i]);
+    while (i < spreadInfo.cityArray.length) {
+        const edgeCount = spreadInfo.pathData.distance(spreadInfo.originNode, spreadInfo.cityArray[i]);
         if (edgeCount !== Infinity) {
-            let individualPath = pathData.path('#' + originId, orderedCities[i]);
-            highlightEle(orderedCities[i], calculateDistance(individualPath) * 50);
+            let individualPath = spreadInfo.pathData.path(spreadInfo.originNode, spreadInfo.cityArray[i]);
+            highlightEle(spreadInfo.cityArray[i], calculateDistance(individualPath) * 50);
         }
         i++;
     }
@@ -230,16 +244,15 @@ findTravelTime = function () {
             showError("No connection");
         } else {
             highlightTravelTime(nodePath);
-            let totalDistance = calculateDistance(nodePath);
-            travelTime.distance = totalDistance;
+            travelTime.distance = calculateDistance(nodePath);
         }
     }
 };
 
-highlightTravelTime = function (collection) {
+highlightTravelTime = function (nodePath) {
     let i = 0;
-    while (i < collection.length) {
-        let el = collection[i];
+    while (i < nodePath.length) {
+        let el = nodePath[i];
         highlightEle(el, i * 1000);
         i++;
     }
@@ -257,7 +270,7 @@ changeTravelHandler = function () {
 changeUsageHandler = function () {
     onReset();
     draw();
-    $(".travel_method_wrapper").toggleClass( "hidden", $("select#usage_method option:checked").val() !== "distance" );
+    $(".travel_method_wrapper").toggleClass("hidden", $("select#usage_method option:checked").val() !== "distance");
 };
 
 onReset = function () {
