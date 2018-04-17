@@ -201,13 +201,23 @@ calculateTime = function (nodePath) {
     return totalTime.toFixed(2);
 };
 
+let highlightTimeoutSet = new Set();
 highlightEle = function (cyElement, delay) {
-    setTimeout(function () {
+    let timer = setTimeout(function () {
         this.addClass('highlighted')
     }.bind(cyElement), delay);
+
+    function stop() {
+        clearTimeout(timer);
+    }
+
+    highlightTimeoutSet.add(stop);
 };
 
 clearHighlighted = function () {
+    for (let stop of highlightTimeoutSet) {
+        stop();
+    }
     cy.batch(function () {
         cy.$('.highlighted').forEach(function (ele) {
             ele.removeClass('highlighted');
