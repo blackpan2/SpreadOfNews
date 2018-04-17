@@ -36,7 +36,7 @@ function initCytoscape() {
                     'line-color': 'red',
                     'line-style': 'dotted',
                     'curve-style': 'haystack',
-                    'haystack-radius': 0
+                    'haystack-radius': .1
                 }
             },
             {
@@ -45,7 +45,7 @@ function initCytoscape() {
                     'line-color': 'blue',
                     'line-style': 'dotted',
                     'curve-style': 'haystack',
-                    'haystack-radius': 0
+                    'haystack-radius': .2
                 }
             },
             {
@@ -54,7 +54,7 @@ function initCytoscape() {
                     'line-color': 'yellow',
                     'line-style': 'dotted',
                     'curve-style': 'haystack',
-                    'haystack-radius': 0
+                    'haystack-radius': .3
                 }
             },
             {
@@ -92,7 +92,8 @@ function initCytoscape() {
                     travelTime.originNode = eventNode;
                 } else {
                     if (travelTime.originNode.data('id') !== eventNode.data('id')) {
-                        if (travelTime.destinationNode === null || travelTime.destinationNode.data('id') !== eventNode.data('id')) {
+                        if (travelTime.destinationNode === null ||
+                            travelTime.destinationNode.data('id') !== eventNode.data('id')) {
                             clearHighlighted();
                             travelTime.destinationNode = eventNode;
                             findTravelTime();
@@ -111,69 +112,93 @@ function initCytoscape() {
 }
 
 /* Canvas */
-function drawStationary() {
+drawStationary = function () {
     switch ($("select#usage_method option:checked").val()) {
         case 'distance':
-            ctx.fillStyle = 'black';
-            ctx.fillRect(10, 10, 400, 250);
-            ctx.fillStyle = 'white';
-            ctx.fillRect(15, 15, 390, 240);
-
-            ctx.font = "small-caps 700 30px system-ui";
-            ctx.fillStyle = "black";
             if (travelTime.originNode) {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(10, 10, 400, 300);
+                ctx.fillStyle = 'white';
+                ctx.fillRect(15, 15, 390, 290);
+                ctx.font = "small-caps 700 30px system-ui";
+                ctx.fillStyle = "black";
                 ctx.fillText("Origin: " + travelTime.originNode.data('name') + ", " + travelTime.originNode.data('state'), 20, 65, 380);
-            }
-            if (travelTime.destinationNode) {
-                // if (true) {
-                ctx.fillText("Destination: " + travelTime.destinationNode.data('name') + ", " + travelTime.destinationNode.data('state'), 20, 115, 380);
-                ctx.fillText("Distance: " + travelTime.distance + "mi.", 20, 165, 380);
-                ctx.fillText("Travel Time: " + travelTime.time + "hr.", 20, 215, 380);
+                if (travelTime.travelMethod) {
+                    ctx.font = "small-caps 700 30px system-ui";
+                    ctx.fillStyle = "black";
+                    ctx.fillText("Travel Method: " + travelTime.travelMethod, 20, 115, 380);
+                    if (travelTime.destinationNode) {
+                        ctx.fillText("Destination: " + travelTime.destinationNode.data('name') + ", " + travelTime.destinationNode.data('state'), 20, 165, 380);
+                        ctx.fillText("Distance: " + travelTime.distance + "mi.", 20, 215, 380);
+                        ctx.fillText("Travel Time: " + travelTime.time + "hr.", 20, 265, 380);
+                    }
+                }
             }
             break;
         case 'spread':
-            ctx.fillStyle = 'black';
-            ctx.fillRect(10, 10, 400, 250);
-            ctx.fillStyle = 'white';
-            ctx.fillRect(15, 15, 390, 240);
-
-            ctx.font = "small-caps 700 30px system-ui";
-            ctx.fillStyle = "black";
             if (spreadInfo.originNode) {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(10, 10, 400, 80);
+                ctx.fillStyle = 'white';
+                ctx.fillRect(15, 15, 390, 70);
+
+                ctx.font = "small-caps 700 30px system-ui";
+                ctx.fillStyle = "black";
                 ctx.fillText("Origin: " + spreadInfo.originNode.data('name') + ", " + spreadInfo.originNode.data('state'), 20, 65, 380);
             }
             break;
     }
-}
+};
 
-function drawBackground() {
+drawBackground = function () {
     layer.resetTransform(ctx);
     layer.clear(ctx);
     layer.setTransform(ctx);
     ctx.save();
     ctx.drawImage(background, 0, 0, 1000, 1260);
-}
+};
 
-function draw() {
+draw = function () {
     drawBackground();
     layer.resetTransform(ctx);
     ctx.save();
 
     drawStationary();
     ctx.restore();
-}
+};
 
 /* Common */
 calculateDistance = function (nodePath) {
-    nodePath = nodePath.filter(function (ele, i) {
+    nodePath = nodePath.filter(function (ele) {
         return ele.isEdge();
     });
     let totalDistance = 0;
-    nodePath.forEach(function (ele) {
-        totalDistance = totalDistance + parseFloat(ele.data('length'));
-
+    nodePath.forEach(function (edge) {
+        totalDistance = totalDistance + parseFloat(edge.data('length'));
     });
     return totalDistance.toFixed(2);
+};
+
+timeOnEdge = function (edge) {
+    switch (edge._private.data.type) {
+        case "road":
+            return (parseInt(edge._private.data.length) / 8);
+        case "canal":
+            return (parseInt(edge._private.data.length) / 5);
+        case "railroad":
+            return (parseInt(edge._private.data.length) / 15);
+    }
+};
+
+calculateTime = function (nodePath) {
+    nodePath = nodePath.filter(function (ele) {
+        return ele.isEdge();
+    });
+    let totalTime = 0;
+    nodePath.forEach(function (edge) {
+        totalTime = totalTime + parseFloat(timeOnEdge(edge));
+    });
+    return totalTime.toFixed(2);
 };
 
 highlightEle = function (cyElement, delay) {
@@ -199,11 +224,24 @@ let spreadInfo = {
 
 spreadToAllNodes = function () {
     spreadInfo.pathData = cy.elements().floydWarshall(function (edge) {
-        return edge.data('length');
+        let time;
+        switch (edge._private.data.type) {
+            case "road":
+                time = (parseInt(edge._private.data.length) / 8).toFixed(2);
+                break;
+            case "canal":
+                time = (parseInt(edge._private.data.length) / 5).toFixed(2);
+                break;
+            case "railroad":
+                time = (parseInt(edge._private.data.length) / 15).toFixed(2);
+                break;
+        }
+        return time;
     });
     spreadInfo.cityArray = cy.collection('.city').sort(function (nodeA, nodeB) {
-        return spreadInfo.pathData.distance(spreadInfo.originNode, nodeA)
-            - spreadInfo.pathData.distance(spreadInfo.originNode, nodeB);
+        let pathA = spreadInfo.pathData.path(spreadInfo.originNode, nodeA);
+        let pathB = spreadInfo.pathData.path(spreadInfo.originNode, nodeB);
+        return calculateTime(pathA) - calculateTime(pathB);
     }).toArray();
 };
 
@@ -213,7 +251,8 @@ highlightSpread = function () {
         const edgeCount = spreadInfo.pathData.distance(spreadInfo.originNode, spreadInfo.cityArray[i]);
         if (edgeCount !== Infinity) {
             let individualPath = spreadInfo.pathData.path(spreadInfo.originNode, spreadInfo.cityArray[i]);
-            highlightEle(spreadInfo.cityArray[i], calculateDistance(individualPath) * 50);
+            console.log(calculateTime(individualPath));
+            highlightEle(spreadInfo.cityArray[i], calculateTime(individualPath) * 500);
         }
         i++;
     }
@@ -223,21 +262,44 @@ highlightSpread = function () {
 let travelTime = {
     originNode: null,
     destinationNode: null,
+    travelMethod: "",
     distance: 0,
     time: 0
 };
 
+getTravelMethodChecked = function () {
+    return $("select#travel_method option:checked").val();
+};
+
 findTravelTime = function () {
-    let travel_method = $("select#travel_method option:checked").val();
-    if (travel_method === "") {
+    if (travelTime.travelMethod === "") {
         showError("Please select a travel method");
     }
     else if (travelTime.originNode !== null && travelTime.destinationNode !== null) {
-        let coll = cy.collection()
-            .add(cy.nodes('.city'))
-            .add(cy.edges('.' + travel_method));
+        let coll = cy.collection().add(cy.nodes('.city'));
+        switch (getTravelMethodChecked()) {
+            case "road":
+                coll = coll.add(cy.edges('.road'));
+                break;
+            case "canal":
+                coll = coll.add(cy.edges('.road'))
+                    .add(cy.edges('.canal'));
+                break;
+            case "railroad":
+                coll = coll.add(cy.edges('.road'))
+                    .add(cy.edges('.canal'))
+                    .add(cy.edges('.railroad'));
+                break;
+        }
         let dijkstra = coll.dijkstra(travelTime.originNode, function (edge) {
-            return parseInt(edge._private.data.length);
+            switch (edge._private.data.type) {
+                case "road":
+                    return parseInt(edge._private.data.length) / 8;
+                case "canal":
+                    return parseInt(edge._private.data.length) / 5;
+                case "railroad":
+                    return parseInt(edge._private.data.length) / 15;
+            }
         }, false);
         let nodePath = dijkstra.pathTo(travelTime.destinationNode);
         if (nodePath.length === 1) {
@@ -245,6 +307,7 @@ findTravelTime = function () {
         } else {
             highlightTravelTime(nodePath);
             travelTime.distance = calculateDistance(nodePath);
+            travelTime.time = calculateTime(nodePath);
         }
     }
 };
@@ -260,9 +323,15 @@ highlightTravelTime = function (nodePath) {
 
 /* Event Handlers */
 changeTravelHandler = function () {
+    if (travelTime.travelMethod === "") {
+        clearHighlighted();
+        draw();
+        travelTime.travelMethod = getTravelMethodChecked();
+    }
     if (travelTime.originNode !== null && travelTime.destinationNode !== null || travelTime.originNode === null && travelTime.destinationNode === null) {
         clearHighlighted();
         onCloseError();
+        travelTime.travelMethod = getTravelMethodChecked();
         findTravelTime();
     }
 };
@@ -274,8 +343,13 @@ changeUsageHandler = function () {
 };
 
 onReset = function () {
+    spreadInfo.originNode = null;
+    spreadInfo.pathData = null;
+    spreadInfo.cityArray = null;
+
     travelTime.originNode = null;
     travelTime.destinationNode = null;
+    travelTime.travelMethod = getTravelMethodChecked();
     travelTime.distance = 0;
     travelTime.time = 0;
 

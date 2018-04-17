@@ -383,8 +383,8 @@
     {
       "data": {
         "source": "NY_NY",
-        "target": "PA_P",
-        "length": "79.89",
+        "target": "NJ_T",
+        "length": "46.84",
         "type": "railroad"
       },
       "classes": "railroad"
