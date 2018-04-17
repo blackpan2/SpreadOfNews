@@ -328,6 +328,8 @@ changeTravelHandler = function () {
         travelTime.travelMethod = getTravelMethodChecked();
     }
     if (travelTime.originNode !== null && travelTime.destinationNode !== null || travelTime.originNode === null && travelTime.destinationNode === null) {
+        travelTime.distance = 0;
+        travelTime.time = 0;
         clearHighlighted();
         onCloseError();
         travelTime.travelMethod = getTravelMethodChecked();
