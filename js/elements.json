@@ -3,7 +3,8 @@
     {
       "data": {
         "id": "MA_B",
-        "name": "Boston"
+        "name": "Boston",
+        "state": "MA"
       },
       "classes": "city",
       "position": {
@@ -14,7 +15,8 @@
     {
       "data": {
         "id": "MA_W",
-        "name": "Worcester"
+        "name": "Worcester",
+        "state": "MA"
       },
       "classes": "city",
       "position": {
@@ -25,7 +27,8 @@
     {
       "data": {
         "id": "NY_NY",
-        "name": "New York"
+        "name": "New York",
+        "state": "NY"
       },
       "classes": "city",
       "position": {
@@ -36,7 +39,8 @@
     {
       "data": {
         "id": "NY_N",
-        "name": "Newburg"
+        "name": "Newburg",
+        "state": "NY"
       },
       "classes": "city",
       "position": {
@@ -47,7 +51,8 @@
     {
       "data": {
         "id": "VA_R",
-        "name": "Richmond"
+        "name": "Richmond",
+        "state": "VA"
       },
       "classes": "city",
       "position": {
@@ -58,7 +63,8 @@
     {
       "data": {
         "id": "CT_H",
-        "name": "Hartford"
+        "name": "Hartford",
+        "state": "CT"
       },
       "classes": "city",
       "position": {
@@ -69,7 +75,8 @@
     {
       "data": {
         "id": "RI_P",
-        "name": "Providence"
+        "name": "Providence",
+        "state":"RI"
       },
       "classes": "city",
       "position": {
@@ -80,7 +87,8 @@
     {
       "data": {
         "id": "CT_L",
-        "name": "London"
+        "name": "London",
+        "state":"CT"
       },
       "classes": "city",
       "position": {
@@ -91,7 +99,8 @@
     {
       "data": {
         "id": "CT_N",
-        "name": "New Haven"
+        "name": "New Haven",
+        "state": "CT"
       },
       "classes": "city",
       "position": {
@@ -102,7 +111,8 @@
     {
       "data": {
         "id": "MD_B",
-        "name": "Baltimore"
+        "name": "Baltimore",
+        "state": "MD"
       },
       "classes": "city",
       "position": {
@@ -113,7 +123,8 @@
     {
       "data": {
         "id": "NY_MPt",
-        "name": "Montauk Pt."
+        "name": "Montauk Pt.",
+        "state": "NY"
       },
       "classes": "city",
       "position": {
@@ -124,7 +135,8 @@
     {
       "data": {
         "id": "NJ_T",
-        "name": "Trenton"
+        "name": "Trenton",
+        "state": "NJ"
       },
       "classes": "city",
       "position": {
@@ -135,7 +147,8 @@
     {
       "data": {
         "id": "NJ_Tu",
-        "name": "Tuckertown"
+        "name": "Tuckertown",
+        "state": "NJ"
       },
       "classes": "city",
       "position": {
@@ -146,7 +159,8 @@
     {
       "data": {
         "id": "PA_P",
-        "name": "Philidelphia"
+        "name": "Philadelphia",
+        "state": "PA"
       },
       "classes": "city",
       "position": {
@@ -157,7 +171,8 @@
     {
       "data": {
         "id": "PA_W",
-        "name": "Wilmington"
+        "name": "Wilmington",
+        "state": "PA"
       },
       "classes": "city",
       "position": {
@@ -168,7 +183,8 @@
     {
       "data": {
         "id": "MD_SH",
-        "name": "Snow Hill"
+        "name": "Snow Hill",
+        "state": "MD"
       },
       "classes": "city",
       "position": {
@@ -179,7 +195,8 @@
     {
       "data": {
         "id": "PA_G",
-        "name": "Gettysburg"
+        "name": "Gettysburg",
+        "state": "PA"
       },
       "classes": "city",
       "position": {
@@ -190,7 +207,8 @@
     {
       "data": {
         "id": "PA_L",
-        "name": "Lancaster"
+        "name": "Lancaster",
+        "state": "PA"
       },
       "classes": "city",
       "position": {
@@ -201,7 +219,8 @@
     {
       "data": {
         "id": "PA_E",
-        "name": "Easton"
+        "name": "Easton",
+        "state": "PA"
       },
       "classes": "city",
       "position": {
@@ -212,7 +231,8 @@
     {
       "data": {
         "id": "PA_R",
-        "name": "Reading"
+        "name": "Reading",
+        "state": "PA"
       },
       "classes": "city",
       "position": {
@@ -223,7 +243,8 @@
     {
       "data": {
         "id": "PA_Y",
-        "name": "York"
+        "name": "York",
+        "state": "PA"
       },
       "classes": "city",
       "position": {

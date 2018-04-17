@@ -72,21 +72,65 @@ function initCytoscape() {
     cy.boxSelectionEnabled(false);
     cy.autolock(true);
 
+    layer = cy.cyCanvas({
+        zIndex: -1
+    });
+    canvas = layer.getCanvas();
+    ctx = canvas.getContext('2d');
+    function drawStationary() {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(10, 10, 400, 250);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(15, 15, 390, 240);
+
+        ctx.font = "small-caps 700 30px system-ui";
+        ctx.fillStyle = "black";
+        if (travelTime.originNode) {
+            ctx.fillText("Origin: " + travelTime.originNode.data('name') + ", " + travelTime.originNode.data('state'), 20, 65, 380);
+        }
+        if (travelTime.destinationNode) {
+            // if (true) {
+            ctx.fillText("Destination: " + travelTime.destinationNode.data('name') + ", " + travelTime.destinationNode.data('state'), 20, 115, 380);
+            ctx.fillText("Distance: " + travelTime.distance + "mi.", 20, 165, 380);
+            ctx.fillText("Travel Time: " + travelTime.time + "hr.", 20, 215, 380);
+        }
+    }
+
+    function drawBackground() {
+        layer.resetTransform(ctx);
+        layer.clear(ctx);
+        layer.setTransform(ctx);
+        ctx.save();
+        ctx.drawImage(background, 0, 0, 1000, 1260);
+    }
+
+    function draw() {
+        drawBackground();
+        layer.resetTransform(ctx);
+        ctx.save();
+
+        drawStationary();
+        ctx.restore();
+    }
+
+    draw();
+    cy.on("render cyCanvas.resize", function () {
+        draw();
+    });
+
     cy.on('tap', 'node', function (evt) {
         let eventId = evt.target[0]._private.data.id;
         switch ($("select#usage_method option:checked").val()) {
             case 'distance':
                 let eventNode = cy.$('#' + eventId);
-                if (originNode === null) {
-                    $('#origin-city-name').text(eventNode.data('name'));
-                    originNode = eventNode;
+                if (travelTime.originNode === null) {
+                    travelTime.originNode = eventNode;
                 } else {
-                    if (originNode.data('id') !== eventNode.data('id')) {
-                        if (destinationNode === null || destinationNode.data('id') !== eventNode.data('id')) {
+                    if (travelTime.originNode.data('id') !== eventNode.data('id')) {
+                        if (travelTime.destinationNode === null || travelTime.destinationNode.data('id') !== eventNode.data('id')) {
                             clearHighlighted();
-                            destinationNode = eventNode;
-                            $('#destination-city-name').text(eventNode.data('name'));
-                            travelTime();
+                            travelTime.destinationNode = eventNode;
+                            findTravelTime();
                         }
                     }
                 }
@@ -96,31 +140,8 @@ function initCytoscape() {
                 highlightSpread(eventId, spread.pathData, spread.array);
                 break;
         }
-    });
-
-    layer = cy.cyCanvas({
-        zIndex: -1
-    });
-    canvas = layer.getCanvas();
-    ctx = canvas.getContext('2d');
-    function draw() {
-        layer.resetTransform(ctx);
-        layer.clear(ctx);
-        layer.setTransform(ctx);
-
-        ctx.save();
-        // Draw a background
-        ctx.drawImage(background, 0, 0, 1000, 1260);
-
-        layer.resetTransform(ctx);
-        ctx.save();
-        ctx.restore();
-    }
-
-    cy.on("render cyCanvas.resize", function () {
         draw();
     });
-    draw();
 }
 
 /* Common */
@@ -177,27 +198,32 @@ highlightSpread = function (originId, pathData, orderedCities) {
 };
 
 /* Travel time between cities functionality */
-let originNode = null;
-let destinationNode = null;
+let travelTime = {
+    originNode: null,
+    destinationNode: null,
+    distance: 0,
+    time: 0
+};
 
-travelTime = function () {
+findTravelTime = function () {
     let travel_method = $("select#travel_method option:checked").val();
     if (travel_method === "") {
         showError("Please select a travel method");
     }
-    else if (originNode !== null && destinationNode !== null) {
+    else if (travelTime.originNode !== null && travelTime.destinationNode !== null) {
         let coll = cy.collection()
             .add(cy.nodes('.city'))
             .add(cy.edges('.' + travel_method));
-        let dijkstra = coll.dijkstra(originNode, function (edge) {
+        let dijkstra = coll.dijkstra(travelTime.originNode, function (edge) {
             return parseInt(edge._private.data.length);
         }, false);
-        let nodePath = dijkstra.pathTo(destinationNode);
+        let nodePath = dijkstra.pathTo(travelTime.destinationNode);
         if (nodePath.length === 1) {
             showError("No connection");
         } else {
             highlightTravelTime(nodePath);
-            reportDistance(calculateDistance(nodePath));
+            let totalDistance = calculateDistance(nodePath);
+            travelTime.distance = totalDistance;
         }
     }
 };
@@ -211,24 +237,20 @@ highlightTravelTime = function (collection) {
     }
 };
 
-reportDistance = function (totalDistance) {
-    $('#distance-report').text(totalDistance);
-};
-
 /* Event Handlers */
 changeEventHandler = function () {
-    if (originNode !== null && destinationNode !== null || originNode === null && destinationNode === null) {
+    if (travelTime.originNode !== null && travelTime.destinationNode !== null || travelTime.originNode === null && travelTime.destinationNode === null) {
         clearHighlighted();
         onCloseError();
-        travelTime();
+        findTravelTime();
     }
 };
 
 onReset = function () {
-    originNode = null;
+    travelTime.originNode = null;
     $('#origin-city-name').text("");
 
-    destinationNode = null;
+    travelTime.destinationNode = null;
     $('#destination-city-name').text("");
 
     $('#distance-report').text("");
