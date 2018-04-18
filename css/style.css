@@ -58,7 +58,7 @@ html {
     visibility: hidden;
 }
 
-.bottomLeftReset {
+.bottomReset {
     height: 50px;
     width: 50px;
     border: 1px solid Black;
@@ -68,7 +68,7 @@ html {
     left: calc(50vw - (/* width */50px / 2));
 }
 
-.bottomLeftMenu {
+.bottomMenu {
     height: 60px;
     width: 200px;
     border: 1px solid Black;
