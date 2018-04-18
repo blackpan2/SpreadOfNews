@@ -117,7 +117,6 @@ function initCytoscape() {
                             clearHighlighted();
                             travelTime.destinationNode = eventNode;
                             findTravelTime();
-                            highlightTravelTime();
                         }
                     }
                 }
@@ -406,6 +405,7 @@ findTravelTime = function () {
         } else {
             travelTime.distance = calculateDistance(travelTime.nodePath);
             travelTime.time = calculateTime(travelTime.nodePath);
+            highlightTravelTime();
         }
     }
 };
@@ -413,7 +413,7 @@ findTravelTime = function () {
 highlightTravelTime = function () {
     let i = 0;
     while (i < travelTime.cities.length) {
-        let nodePath = travelTime.dijkstra.pathTo('#' + travelTime.cities[i].data('id'));
+        let nodePath = travelTime.dijkstra.pathTo(travelTime.cities[i]);
         highlightNodePath(travelTime.originNode, travelTime.cities, nodePath, i, true);
         i++;
     }
