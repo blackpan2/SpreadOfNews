@@ -59,10 +59,28 @@ function initCytoscape() {
                 }
             },
             {
-                selector: '.highlighted',
+                selector: '.Highlight-Green',
                 style: {
                     'line-color': 'green',
                     'background-color': 'green',
+                    'transition-property': 'background-color, line-color line-style',
+                    'transition-duration': '1s'
+                }
+            },
+            {
+                selector: '.Highlight-Orange',
+                style: {
+                    'line-color': 'orange',
+                    'background-color': 'orange',
+                    'transition-property': 'background-color, line-color line-style',
+                    'transition-duration': '1s'
+                }
+            },
+            {
+                selector: '.Highlight-DarkRed',
+                style: {
+                    'line-color': 'DarkRed',
+                    'background-color': 'DarkRed',
                     'transition-property': 'background-color, line-color line-style',
                     'transition-duration': '1s'
                 }
@@ -99,6 +117,7 @@ function initCytoscape() {
                             clearHighlighted();
                             travelTime.destinationNode = eventNode;
                             findTravelTime();
+                            highlightTravelTime();
                         }
                     }
                 }
@@ -247,17 +266,66 @@ calculateTime = function (nodePath) {
     return totalTime.toFixed(2);
 };
 
+generateDijkstra = function (originNode, travelMethod) {
+    let coll = cy.collection().add(cy.nodes('.city'));
+    switch (travelMethod) {
+        case "road":
+            coll = coll.add(cy.edges('.road'));
+            break;
+        case "canal":
+            coll = coll.add(cy.edges('.road'))
+                .add(cy.edges('.canal'));
+            break;
+        case "railroad":
+            coll = coll.add(cy.edges('.road'))
+                .add(cy.edges('.canal'))
+                .add(cy.edges('.railroad'));
+            break;
+    }
+    return coll.dijkstra(originNode, function (edge) {
+        switch (edge._private.data.type) {
+            case "road":
+                return parseInt(edge._private.data.length) / 8;
+            case "canal":
+                return parseInt(edge._private.data.length) / 5;
+            case "railroad":
+                return parseInt(edge._private.data.length) / 15;
+        }
+    }, false);
+};
+
 let highlightTimeoutSet = new Set();
-highlightEle = function (cyElement, delay) {
+highlightEle = function (cyElement, delay, className) {
     let timer = setTimeout(function () {
-        this.addClass('highlighted')
+        this.addClass(className);
+        // this.addClass('DarkRed');
     }.bind(cyElement), delay);
 
     function stop() {
         clearTimeout(timer);
     }
-
     highlightTimeoutSet.add(stop);
+};
+
+highlightNodePath = function (originNode, cityArray, nodePath, i, highlightEdges) {
+    let time = calculateTime(nodePath);
+    if (i === 0) {
+        highlightEle(originNode, 0, "Highlight-Green");
+    }
+    else if (nodePath.length !== 1) {
+        let color = "";
+        if (time > 24) {
+            color = "Highlight-DarkRed";
+        } else if (time > 12) {
+            color = "Highlight-Orange";
+        } else {
+            color = "Highlight-Green";
+        }
+        if (highlightEdges) {
+            highlightEle(cityArray[i].edgesWith(cityArray[i - 1]), time * 250, color);
+        }
+        highlightEle(cityArray[i], time * 250, color);
+    }
 };
 
 clearHighlighted = function () {
@@ -265,8 +333,14 @@ clearHighlighted = function () {
         stop();
     }
     cy.batch(function () {
-        cy.$('.highlighted').forEach(function (ele) {
-            ele.removeClass('highlighted');
+        cy.$('.Highlight-Green').forEach(function (ele) {
+            ele.removeClass('Highlight-Green');
+        });
+        cy.$('.Highlight-Orange').forEach(function (ele) {
+            ele.removeClass('Highlight-Orange');
+        });
+        cy.$('.Highlight-DarkRed').forEach(function (ele) {
+            ele.removeClass('Highlight-DarkRed');
         });
     });
 };
@@ -274,29 +348,21 @@ clearHighlighted = function () {
 /* Spread to all node functionality */
 let spreadInfo = {
     originNode: null,
-    pathData: null,
-    cityArray: null
+    cityArray: null,
+    pathData: null
 };
 
 spreadToAllNodes = function () {
-    spreadInfo.pathData = cy.elements().floydWarshall(function (edge) {
-        let time;
-        switch (edge._private.data.type) {
-            case "road":
-                time = (parseInt(edge._private.data.length) / 8).toFixed(2);
-                break;
-            case "canal":
-                time = (parseInt(edge._private.data.length) / 5).toFixed(2);
-                break;
-            case "railroad":
-                time = (parseInt(edge._private.data.length) / 15).toFixed(2);
-                break;
-        }
-        return time;
+    let dijkstra = generateDijkstra(spreadInfo.originNode, "railroad");
+    let cityArray = cy.collection('.city').toArray();
+    let pathData = {};
+    cityArray.forEach(function (cityNode) {
+        pathData[cityNode.data('id')] = dijkstra.pathTo(cityNode);
     });
-    spreadInfo.cityArray = cy.collection('.city').sort(function (nodeA, nodeB) {
-        let pathA = spreadInfo.pathData.path(spreadInfo.originNode, nodeA);
-        let pathB = spreadInfo.pathData.path(spreadInfo.originNode, nodeB);
+    spreadInfo.pathData = pathData;
+    spreadInfo.cityArray = cy.collection('.city').sort(function (cityA, cityB) {
+        let pathA = spreadInfo.pathData[cityA.data('id')];
+        let pathB = spreadInfo.pathData[cityB.data('id')];
         return calculateTime(pathA) - calculateTime(pathB);
     }).toArray();
 };
@@ -304,11 +370,8 @@ spreadToAllNodes = function () {
 highlightSpread = function () {
     let i = 0;
     while (i < spreadInfo.cityArray.length) {
-        const edgeCount = spreadInfo.pathData.distance(spreadInfo.originNode, spreadInfo.cityArray[i]);
-        if (edgeCount !== Infinity) {
-            let individualPath = spreadInfo.pathData.path(spreadInfo.originNode, spreadInfo.cityArray[i]);
-            highlightEle(spreadInfo.cityArray[i], calculateTime(individualPath) * 500);
-        }
+        let nodePath = spreadInfo.pathData[spreadInfo.cityArray[i].data('id')];
+        highlightNodePath(spreadInfo.originNode, spreadInfo.cityArray, nodePath, i, false);
         i++;
     }
 };
@@ -317,6 +380,8 @@ highlightSpread = function () {
 let travelTime = {
     originNode: null,
     destinationNode: null,
+    dijkstra: null,
+    nodePath: null,
     travelMethod: "",
     distance: 0,
     time: 0
@@ -331,47 +396,25 @@ findTravelTime = function () {
         showError("Please select a travel method");
     }
     else if (travelTime.originNode !== null && travelTime.destinationNode !== null) {
-        let coll = cy.collection().add(cy.nodes('.city'));
-        switch (getTravelMethodChecked()) {
-            case "road":
-                coll = coll.add(cy.edges('.road'));
-                break;
-            case "canal":
-                coll = coll.add(cy.edges('.road'))
-                    .add(cy.edges('.canal'));
-                break;
-            case "railroad":
-                coll = coll.add(cy.edges('.road'))
-                    .add(cy.edges('.canal'))
-                    .add(cy.edges('.railroad'));
-                break;
-        }
-        let dijkstra = coll.dijkstra(travelTime.originNode, function (edge) {
-            switch (edge._private.data.type) {
-                case "road":
-                    return parseInt(edge._private.data.length) / 8;
-                case "canal":
-                    return parseInt(edge._private.data.length) / 5;
-                case "railroad":
-                    return parseInt(edge._private.data.length) / 15;
-            }
-        }, false);
-        let nodePath = dijkstra.pathTo(travelTime.destinationNode);
-        if (nodePath.length === 1) {
+        travelTime.dijkstra = generateDijkstra(travelTime.originNode, getTravelMethodChecked());
+        travelTime.nodePath = travelTime.dijkstra.pathTo(travelTime.destinationNode);
+        travelTime.cities = travelTime.nodePath.filter(function (ele) {
+            return ele.isNode();
+        });
+        if (travelTime.nodePath.length === 1) {
             showError("No connection");
         } else {
-            highlightTravelTime(nodePath);
-            travelTime.distance = calculateDistance(nodePath);
-            travelTime.time = calculateTime(nodePath);
+            travelTime.distance = calculateDistance(travelTime.nodePath);
+            travelTime.time = calculateTime(travelTime.nodePath);
         }
     }
 };
 
-highlightTravelTime = function (nodePath) {
+highlightTravelTime = function () {
     let i = 0;
-    while (i < nodePath.length) {
-        let el = nodePath[i];
-        highlightEle(el, i * 1000);
+    while (i < travelTime.cities.length) {
+        let nodePath = travelTime.dijkstra.pathTo('#' + travelTime.cities[i].data('id'));
+        highlightNodePath(travelTime.originNode, travelTime.cities, nodePath, i, true);
         i++;
     }
 };
