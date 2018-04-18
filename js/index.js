@@ -196,11 +196,13 @@ drawReport = function () {
                 backgroundCtx.font = "small-caps 700 30px system-ui";
                 backgroundCtx.fillStyle = "black";
                 backgroundCtx.textBaseline = "middle";
-                backgroundCtx.fillText("Origin: " + travelTime.originNode.data('name') + ", " + travelTime.originNode.data('state'), 20, 50, 380);
+                backgroundCtx.fillText("Origin: " + travelTime.originNode.data('name') + ", " +
+                    travelTime.originNode.data('state'), 20, 50, 380);
                 if (travelTime.travelMethod) {
                     backgroundCtx.fillText("Travel Method: " + travelTime.travelMethod, 20, 100, 380);
                     if (travelTime.destinationNode) {
-                        backgroundCtx.fillText("Destination: " + travelTime.destinationNode.data('name') + ", " + travelTime.destinationNode.data('state'), 20, 150, 380);
+                        backgroundCtx.fillText("Destination: " + travelTime.destinationNode.data('name') + ", " +
+                            travelTime.destinationNode.data('state'), 20, 150, 380);
                         backgroundCtx.fillText("Distance: " + travelTime.distance + "mi.", 20, 200, 380);
                         backgroundCtx.fillText("Travel Time: " + travelTime.time + "hr.", 20, 250, 380);
                     }
@@ -217,7 +219,8 @@ drawReport = function () {
                 backgroundCtx.font = "small-caps 700 30px system-ui";
                 backgroundCtx.textBaseline = "middle";
                 backgroundCtx.fillStyle = "black";
-                backgroundCtx.fillText("Origin: " + spreadInfo.originNode.data('name') + ", " + spreadInfo.originNode.data('state'), 20, 50, 380);
+                backgroundCtx.fillText("Origin: " + spreadInfo.originNode.data('name') + ", " +
+                    spreadInfo.originNode.data('state'), 20, 50, 380);
             }
             break;
     }
@@ -297,12 +300,12 @@ let highlightTimeoutSet = new Set();
 highlightEle = function (cyElement, delay, className) {
     let timer = setTimeout(function () {
         this.addClass(className);
-        // this.addClass('DarkRed');
     }.bind(cyElement), delay);
 
     function stop() {
         clearTimeout(timer);
     }
+
     highlightTimeoutSet.add(stop);
 };
 
@@ -426,7 +429,8 @@ changeTravelHandler = function () {
         draw();
         travelTime.travelMethod = getTravelMethodChecked();
     }
-    if (travelTime.originNode !== null && travelTime.destinationNode !== null || travelTime.originNode === null && travelTime.destinationNode === null) {
+    else if (travelTime.originNode !== null && travelTime.destinationNode !== null ||
+        travelTime.originNode === null && travelTime.destinationNode === null) {
         travelTime.distance = 0;
         travelTime.time = 0;
         clearHighlighted();
@@ -444,8 +448,8 @@ changeUsageHandler = function () {
 
 onReset = function () {
     spreadInfo.originNode = null;
-    spreadInfo.pathData = null;
     spreadInfo.cityArray = null;
+    spreadInfo.pathData = null;
 
     travelTime.originNode = null;
     travelTime.destinationNode = null;
@@ -474,3 +478,77 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('select[name="travel_method"]').onchange = changeTravelHandler;
     document.querySelector('select[name="usage_method"]').onchange = changeUsageHandler;
 }, false);
+
+// Future Elements:
+// {
+//     "data": {
+//         "id": "PA_Y",
+//         "name": "York",
+//         "state": "PA"
+//     },
+//     "classes": "city",
+//     "position": {
+//         "x": 677,
+//         "y": 509
+//     }
+// },
+// {
+//     "data": {
+//         "id": "PA_G",
+//         "name": "Gettysburg",
+//         "state": "PA"
+//     },
+//     "classes": "city",
+//     "position": {
+//         "x": 659,
+//         "y": 514
+//     }
+// },
+// {
+//     "data": {
+//     "id": "PA_W",
+//         "name": "Wilmington",
+//         "state": "PA"
+//     },
+//     "classes": "city",
+//     "position": {
+//         "x": 718,
+//         "y": 515
+//     }
+// },
+// {
+//     "data": {
+//         "id": "MD_B",
+//         "name": "Baltimore",
+//         "state": "MD"
+//     },
+//     "classes": "city",
+//     "position": {
+//         "x": 685,
+//         "y": 536
+//     }
+// },
+// {
+//     "data": {
+//         "id": "MD_SH",
+//         "name": "Snow Hill",
+//         "state": "MD"
+//     },
+//     "classes": "city",
+//     "position": {
+//         "x": 729,
+//         "y": 578
+//     }
+// },
+// {
+//     "data": {
+//     "id": "VA_R",
+//         "name": "Richmond",
+//         "state": "VA"
+//     },
+//     "classes": "city",
+//     "position": {
+//         "x": 661,
+//         "y": 609
+//     }
+// },

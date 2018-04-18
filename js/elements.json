@@ -50,18 +50,6 @@
     },
     {
       "data": {
-        "id": "VA_R",
-        "name": "Richmond",
-        "state": "VA"
-      },
-      "classes": "city",
-      "position": {
-        "x": 661,
-        "y": 609
-      }
-    },
-    {
-      "data": {
         "id": "CT_H",
         "name": "Hartford",
         "state": "CT"
@@ -106,18 +94,6 @@
       "position": {
         "x": 808,
         "y": 440
-      }
-    },
-    {
-      "data": {
-        "id": "MD_B",
-        "name": "Baltimore",
-        "state": "MD"
-      },
-      "classes": "city",
-      "position": {
-        "x": 685,
-        "y": 536
       }
     },
     {
@@ -170,42 +146,6 @@
     },
     {
       "data": {
-        "id": "PA_W",
-        "name": "Wilmington",
-        "state": "PA"
-      },
-      "classes": "city",
-      "position": {
-        "x": 718,
-        "y": 515
-      }
-    },
-    {
-      "data": {
-        "id": "MD_SH",
-        "name": "Snow Hill",
-        "state": "MD"
-      },
-      "classes": "city",
-      "position": {
-        "x": 729,
-        "y": 578
-      }
-    },
-    {
-      "data": {
-        "id": "PA_G",
-        "name": "Gettysburg",
-        "state": "PA"
-      },
-      "classes": "city",
-      "position": {
-        "x": 659,
-        "y": 514
-      }
-    },
-    {
-      "data": {
         "id": "PA_L",
         "name": "Lancaster",
         "state": "PA"
@@ -238,18 +178,6 @@
       "position": {
         "x": 704,
         "y": 486
-      }
-    },
-    {
-      "data": {
-        "id": "PA_Y",
-        "name": "York",
-        "state": "PA"
-      },
-      "classes": "city",
-      "position": {
-        "x": 677,
-        "y": 509
       }
     }
   ],
