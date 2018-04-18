@@ -10,9 +10,10 @@ xhttp.open("GET", "./js/elements.json", true);
 xhttp.send();
 
 let cy;
-let layer;
-let canvas;
-let ctx;
+let backgroundLayer;
+let menuLayer;
+let backgroundCtx;
+let menuCtx;
 
 const background = new Image();
 background.src = "maps/usMap1835-export.jpg";
@@ -72,11 +73,12 @@ function initCytoscape() {
     cy.boxSelectionEnabled(false);
     cy.autolock(true);
 
-    layer = cy.cyCanvas({
-        zIndex: -1
-    });
-    canvas = layer.getCanvas();
-    ctx = canvas.getContext('2d');
+    backgroundLayer = cy.cyCanvas({zIndex: -1});
+    let backgroundCanvas = backgroundLayer.getCanvas();
+    backgroundCtx = backgroundCanvas.getContext('2d');
+    menuLayer = cy.cyCanvas({zIndex: 1});
+    let menuCanvas = menuLayer.getCanvas();
+    menuCtx = menuCanvas.getContext('2d');
 
     draw();
     cy.on("render cyCanvas.resize", function () {
@@ -112,59 +114,103 @@ function initCytoscape() {
 }
 
 /* Canvas */
-drawStationary = function () {
+draw = function () {
+    drawBackground();
+    backgroundLayer.resetTransform(backgroundCtx);
+    backgroundCtx.save();
+
+    drawLegend();
+    drawReport();
+    backgroundCtx.restore();
+};
+
+drawLegend = function () {
+    // Outline
+    menuCtx.fillStyle = 'black';
+    menuCtx.fillRect(10, 975, 300, 210);
+    menuCtx.fillStyle = '#FDD585';
+    menuCtx.fillRect(15, 980, 290, 200);
+
+    // Title
+    menuCtx.font = "small-caps 700 30px system-ui";
+    menuCtx.fillStyle = "black";
+    menuCtx.textBaseline = "middle";
+    menuCtx.fillText("Legend", 20, 1000, 250);
+
+    // Line Style
+    menuCtx.setLineDash([7]);
+    menuCtx.lineWidth = 20;
+
+    // Road
+    menuCtx.fillText("Road 8mph: ", 20, 1050, 180);
+    menuCtx.beginPath();
+    menuCtx.moveTo(200, 1050);
+    menuCtx.lineTo(290, 1050);
+    menuCtx.strokeStyle = "#FF0000";
+    menuCtx.stroke();
+
+    // Canal
+    menuCtx.fillText("Canal 5mph: ", 20, 1100, 180);
+    menuCtx.beginPath();
+    menuCtx.moveTo(200, 1100);
+    menuCtx.lineTo(290, 1100);
+    menuCtx.strokeStyle = "#FFFF00";
+    menuCtx.stroke();
+
+    // Railroad
+    menuCtx.fillText("Railroad 15mph: ", 20, 1150, 180);
+    menuCtx.beginPath();
+    menuCtx.moveTo(200, 1150);
+    menuCtx.lineTo(290, 1150);
+    menuCtx.strokeStyle = "#0000FF";
+    menuCtx.stroke();
+};
+
+drawReport = function () {
     switch ($("select#usage_method option:checked").val()) {
         case 'distance':
             if (travelTime.originNode) {
-                ctx.fillStyle = 'black';
-                ctx.fillRect(10, 10, 400, 300);
-                ctx.fillStyle = 'white';
-                ctx.fillRect(15, 15, 390, 290);
-                ctx.font = "small-caps 700 30px system-ui";
-                ctx.fillStyle = "black";
-                ctx.fillText("Origin: " + travelTime.originNode.data('name') + ", " + travelTime.originNode.data('state'), 20, 65, 380);
+                backgroundCtx.fillStyle = 'black';
+                backgroundCtx.fillRect(10, 10, 400, 300);
+                backgroundCtx.fillStyle = 'white';
+                backgroundCtx.fillRect(15, 15, 390, 290);
+
+                backgroundCtx.font = "small-caps 700 30px system-ui";
+                backgroundCtx.fillStyle = "black";
+                backgroundCtx.textBaseline = "middle";
+                backgroundCtx.fillText("Origin: " + travelTime.originNode.data('name') + ", " + travelTime.originNode.data('state'), 20, 50, 380);
                 if (travelTime.travelMethod) {
-                    ctx.font = "small-caps 700 30px system-ui";
-                    ctx.fillStyle = "black";
-                    ctx.fillText("Travel Method: " + travelTime.travelMethod, 20, 115, 380);
+                    backgroundCtx.fillText("Travel Method: " + travelTime.travelMethod, 20, 100, 380);
                     if (travelTime.destinationNode) {
-                        ctx.fillText("Destination: " + travelTime.destinationNode.data('name') + ", " + travelTime.destinationNode.data('state'), 20, 165, 380);
-                        ctx.fillText("Distance: " + travelTime.distance + "mi.", 20, 215, 380);
-                        ctx.fillText("Travel Time: " + travelTime.time + "hr.", 20, 265, 380);
+                        backgroundCtx.fillText("Destination: " + travelTime.destinationNode.data('name') + ", " + travelTime.destinationNode.data('state'), 20, 150, 380);
+                        backgroundCtx.fillText("Distance: " + travelTime.distance + "mi.", 20, 200, 380);
+                        backgroundCtx.fillText("Travel Time: " + travelTime.time + "hr.", 20, 250, 380);
                     }
                 }
             }
             break;
         case 'spread':
             if (spreadInfo.originNode) {
-                ctx.fillStyle = 'black';
-                ctx.fillRect(10, 10, 400, 80);
-                ctx.fillStyle = 'white';
-                ctx.fillRect(15, 15, 390, 70);
+                backgroundCtx.fillStyle = 'black';
+                backgroundCtx.fillRect(10, 10, 400, 80);
+                backgroundCtx.fillStyle = 'white';
+                backgroundCtx.fillRect(15, 15, 390, 70);
 
-                ctx.font = "small-caps 700 30px system-ui";
-                ctx.fillStyle = "black";
-                ctx.fillText("Origin: " + spreadInfo.originNode.data('name') + ", " + spreadInfo.originNode.data('state'), 20, 65, 380);
+                backgroundCtx.font = "small-caps 700 30px system-ui";
+                backgroundCtx.textBaseline = "middle";
+                backgroundCtx.fillStyle = "black";
+                backgroundCtx.fillText("Origin: " + spreadInfo.originNode.data('name') + ", " + spreadInfo.originNode.data('state'), 20, 50, 380);
             }
             break;
     }
 };
 
 drawBackground = function () {
-    layer.resetTransform(ctx);
-    layer.clear(ctx);
-    layer.setTransform(ctx);
-    ctx.save();
-    ctx.drawImage(background, 0, 0, 1000, 1260);
-};
-
-draw = function () {
-    drawBackground();
-    layer.resetTransform(ctx);
-    ctx.save();
-
-    drawStationary();
-    ctx.restore();
+    backgroundLayer.resetTransform(backgroundCtx);
+    backgroundLayer.clear(backgroundCtx);
+    backgroundLayer.setTransform(backgroundCtx);
+    backgroundCtx.save();
+    backgroundCtx.drawImage(background, 0, 0, 1000, 1260);
 };
 
 /* Common */
